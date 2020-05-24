@@ -1,0 +1,1 @@
+print("The NUmbers are Prime")
