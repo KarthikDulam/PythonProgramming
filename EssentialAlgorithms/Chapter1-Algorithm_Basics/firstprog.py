@@ -6,3 +6,10 @@ def minus(a,b):
 
 print(sum(2,3))
 print(minus(1,3))
+
+lsi = [0] * 36
+
+for i in range(36):
+    lsi[i] = 150
+
+print(lsi)
