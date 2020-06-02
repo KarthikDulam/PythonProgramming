@@ -71,63 +71,63 @@ class Card(BaseModel, object):
 
     # balance must always be positive
     @validator('cardBalance')
-    def positive_balance(cls, v):
+    def positive_balance(self, v):
         if v < 0:
             raise ValueError('Balance Must Be >= 0')
         return v
 
     # apr must always be positive
     @validator('cardApr')
-    def positive_apr(cls, v):
+    def positive_apr(self, v):
         if v < 0:
             raise ValueError('APR Must Be >= 0')
         return v
 
     # minimum payment must be positive
     @validator('minPayment')
-    def positive_min(cls, v):
+    def positive_min(self, v):
         if v < 0:
             raise ValueError('Minimum Payment Must Be >= 0')
         return v
 
     # maximum payment must be positive
     @validator('maxPayment')
-    def positive_max(cls, v):
+    def positive_max(self, v):
         if v < 0:
             raise ValueError('Maximum Payment Must Be >= 0')
         return v
 
     # actual payments must be positive
     @validator('actualPayments')
-    def positive_actual(cls, v):
+    def positive_actual(self, v):
         if v < 0:
             raise ValueError('Actual Payments Must Be >= 0')
         return v
 
     # minimum payments cannot be more than balance
     @validator('minPayment')
-    def min_lt_balance(cls, v, values):
+    def min_lt_balance(self, v, values):
         if 'cardBalance' in values and v > values['cardBalance']:
             raise ValueError('Minimum Payment Cannot Be Higher Than Balance')
         return v
 
     # maximum payments cannot be more than balance
     @validator('maxPayment')
-    def max_lt_balance(cls, v, values):
+    def max_lt_balance(self, v, values):
         if 'cardBalance' in values and v > values['cardBalance']:
             raise ValueError('Maximum Payment Cannot Be Higher Than Balance')
         return v
 
     # actual payments cannot be more than balance
     @validator('actualPayments')
-    def act_lt_balance(cls, v, values):
+    def act_lt_balance(self, v, values):
         if 'cardBalance' in values and v > values['cardBalance']:
             raise ValueError('Actual Payment Cannot Be Higher Than Balance')
         return v
 
     # max payment must not be less than minimum payment
     @validator('maxPayment')
-    def max_bg_min(cls, v, values):
+    def max_bg_min(self, v, values):
         if 'minPayment' in values and v < values['minPayment']:
             raise ValueError('Maximum Payment Cannot Be Less Than Minimum Payment')
         return v
@@ -138,7 +138,7 @@ class Model(BaseModel):
     cards: typing.List[Card]
 
     @validator('budget')
-    def positive_budget(cls, v):
+    def positive_budget(self, v):
         if v <= 0:
             raise ValueError('Budget Must Be Positive')
         return v
