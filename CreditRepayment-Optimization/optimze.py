@@ -259,7 +259,7 @@ def suggest_payments(model: Model):
         updated_cards.append(dic)
 
     return_data['updatedCards'] = updated_cards
-    print(return_data)
+    
     return return_data
 
 
@@ -324,6 +324,7 @@ def compare_12_months(model: Model):
         new_balance = tuple(round(el, 4) for el in new_balance)
         optimal_monthly.append(new_balance)
 
+    #print(optimal_monthly)
     optimal_monthly = zip(*optimal_monthly)
 
     projections = (tuple(zip(*el)) for el in zip(min_projection, actual_projection, optimal_monthly))
@@ -452,8 +453,3 @@ def allocate(balances: TP, aprs: TP, minimum_payments_: TP, maximum_payments_: T
         money_saved,
         balance_on_actual
     )
-
-
-model = Model(budget= 100.0,cards= [{"cardNickName": "Prime","cardBalance": 1000,"cardApr": 15,"minPayment": 20,"maxPayment": 1000,"actualPayments": 50},{"cardNickName": "United","cardBalance": 1800,"cardApr": 18,"minPayment": 36,"maxPayment": 1800,"actualPayments": 50}] )
-suggest_payments(model)
-print(compare_12_months(model))
