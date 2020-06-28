@@ -460,16 +460,3 @@ def allocate(balances: TP, aprs: TP, minimum_payments_: TP, maximum_payments_: T
         money_saved,
         balance_on_actual
     )
-
-m1 = Model(budget = 1500, cards = [{"cardNickName": "Prime",
-             "cardBalance": 1000,
-             "cardApr": 18,
-             "minPayment": 20,
-             "maxPayment": 1000},
-             {"cardNickName": "United",
-             "cardBalance": 1800,
-             "cardApr": 9,
-             "minPayment": 36,
-             "maxPayment": 1800}])
-
-print(m1.cards)

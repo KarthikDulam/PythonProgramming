@@ -1,4 +1,4 @@
-import optimze as op
+import optimize as op
 
 def main():
     budget = 800.0
