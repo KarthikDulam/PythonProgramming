@@ -1,19 +1,33 @@
 import optimze as op
 
 def main():
-    budget = 100.0
+    budget = 800.0
+    
     cards= [{"cardNickName": "Prime",
              "cardBalance": 1000,
-             "cardApr": 15,
+             "cardApr": 18,
              "minPayment": 20,
              "maxPayment": 1000,
-             "actualPayments": 50},
+             "actualPayments": 200},
             {"cardNickName": "United",
              "cardBalance": 1800,
-             "cardApr": 18,
+             "cardApr": 9,
              "minPayment": 36,
              "maxPayment": 1800,
-             "actualPayments": 50}]
+             "actualPayments": 200},
+             {"cardNickName": "B1",
+             "cardBalance": 2000,
+             "cardApr": 11,
+             "minPayment": 25,
+             "maxPayment": 2000,
+             "actualPayments": 200},
+             {"cardNickName": "B2",
+             "cardBalance": 1300,
+             "cardApr": 15,
+             "minPayment": 40,
+             "maxPayment": 1300,
+             "actualPayments": 200}]
+
 
     model = op.Model(budget=budget,cards= cards)
     

@@ -1,3 +1,4 @@
+# pylint: disable=no-self-argument, method-hidden
 
 import pulp
 import json
@@ -6,33 +7,18 @@ import typing
 import datetime
 import functools
 import itertools
-from fastapi import FastAPI
+#from fastapi import FastAPI
 from pydantic import BaseModel, validator
-
-from starlette.middleware.cors import CORSMiddleware
-
-app = FastAPI()
-
-origins = [
-    "https://pymtallocation.herokuapp.com"
-]
+from typing import List
 
 # for testing locally
-app.add_middleware(
+""" app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-
-api_objective = """
-Find out if you could save on your total credit/loan balance by changing how much you put on each card. \
-We wish to suggest how much you should put towards each of your credit cards so that your next month total balance \
-is the lowest possible.
-We will use the percentage of your minimum payment per your balance to adjust minimum balance
-Or we use a 3% rate is used 
-"""
+) """
 
 months = [
     "January",
@@ -56,7 +42,7 @@ class Card(BaseModel, object):
     cardApr: float
     minPayment: float
     maxPayment: float
-    actualPayments: float
+    actualPayments: float 
     min2balancerate: float = 0.0
     minProjections: typing.List[float] = [0.0] * 13
     actualProjections: typing.List[float] = [0.0] * 13
@@ -71,63 +57,63 @@ class Card(BaseModel, object):
 
     # balance must always be positive
     @validator('cardBalance')
-    def positive_balance(self, v):
+    def positive_balance(cls, v):
         if v < 0:
             raise ValueError('Balance Must Be >= 0')
         return v
 
     # apr must always be positive
     @validator('cardApr')
-    def positive_apr(self, v):
+    def positive_apr(cls, v):
         if v < 0:
             raise ValueError('APR Must Be >= 0')
         return v
 
     # minimum payment must be positive
     @validator('minPayment')
-    def positive_min(self, v):
+    def positive_min(cls, v):
         if v < 0:
             raise ValueError('Minimum Payment Must Be >= 0')
         return v
 
     # maximum payment must be positive
     @validator('maxPayment')
-    def positive_max(self, v):
+    def positive_max(cls, v):
         if v < 0:
             raise ValueError('Maximum Payment Must Be >= 0')
         return v
 
     # actual payments must be positive
     @validator('actualPayments')
-    def positive_actual(self, v):
+    def positive_actual(cls, v):
         if v < 0:
             raise ValueError('Actual Payments Must Be >= 0')
         return v
 
     # minimum payments cannot be more than balance
     @validator('minPayment')
-    def min_lt_balance(self, v, values):
+    def min_lt_balance(cls, v, values):
         if 'cardBalance' in values and v > values['cardBalance']:
             raise ValueError('Minimum Payment Cannot Be Higher Than Balance')
         return v
 
     # maximum payments cannot be more than balance
     @validator('maxPayment')
-    def max_lt_balance(self, v, values):
+    def max_lt_balance(cls, v, values):
         if 'cardBalance' in values and v > values['cardBalance']:
             raise ValueError('Maximum Payment Cannot Be Higher Than Balance')
         return v
 
     # actual payments cannot be more than balance
     @validator('actualPayments')
-    def act_lt_balance(self, v, values):
+    def act_lt_balance(cls, v, values):
         if 'cardBalance' in values and v > values['cardBalance']:
             raise ValueError('Actual Payment Cannot Be Higher Than Balance')
         return v
 
     # max payment must not be less than minimum payment
     @validator('maxPayment')
-    def max_bg_min(self, v, values):
+    def max_bg_min(cls, v, values):
         if 'minPayment' in values and v < values['minPayment']:
             raise ValueError('Maximum Payment Cannot Be Less Than Minimum Payment')
         return v
@@ -136,9 +122,10 @@ class Card(BaseModel, object):
 class Model(BaseModel):
     budget: float
     cards: typing.List[Card]
+    #Savings
 
     @validator('budget')
-    def positive_budget(self, v):
+    def positive_budget(cls, v):
         if v <= 0:
             raise ValueError('Budget Must Be Positive')
         return v
@@ -214,23 +201,29 @@ class CompareResponseModel(BaseModel):
 
 # TODO: Fixed Minimum Payment
 
-@app.get("/")
+""" @app.get("/")
 async def read_root():
     return {
         "Message": "Welcome",
         "Objective": api_objective.strip()
-    }
+    } """
 
 
-@app.post("/cards", response_model=ResponseModel)
-async def suggest_payments(model: Model):
+#@app.post("/cards", response_model=ResponseModel)
+def suggest_payments(model: Model):
     budget = model.budget
+    #Savings = 0
+    # if model.savings is not Null and model.savingsgoal < Savings:
+    # savings = model.budget - sum(card.minimumpayment for card in model.cards)      
+    # budget = sum(card.minimumpayment for card in model.cards)
+             
     balances = tuple(card.cardBalance for card in model.cards)
     aprs = tuple(card.cardApr for card in model.cards)
     minimum_payments = tuple(card.minPayment for card in model.cards)
     maximum_payments = tuple(card.maxPayment for card in model.cards)
     actual_payments = tuple(card.actualPayments for card in model.cards)
-
+    
+    
     # if any actual payment is null then just make it the minimum payment
     actual_payments = tuple(map(lambda act, minp: minp if act is None else act, actual_payments, minimum_payments))
 
@@ -273,12 +266,12 @@ async def suggest_payments(model: Model):
         updated_cards.append(dic)
 
     return_data['updatedCards'] = updated_cards
-
+    
     return return_data
 
 
-@app.post("/cards/12", response_model=CompareResponseModel)
-async def compare_12_months(model: Model):
+#@app.post("/cards/12", response_model=CompareResponseModel)
+def compare_12_months(model: Model):
     # cycle months
     current_month = months[datetime.date.today().month - 1]
     cycles = itertools.cycle(months)  # cycle the months
@@ -338,6 +331,7 @@ async def compare_12_months(model: Model):
         new_balance = tuple(round(el, 4) for el in new_balance)
         optimal_monthly.append(new_balance)
 
+    #print(optimal_monthly)
     optimal_monthly = zip(*optimal_monthly)
 
     projections = (tuple(zip(*el)) for el in zip(min_projection, actual_projection, optimal_monthly))
@@ -466,3 +460,16 @@ def allocate(balances: TP, aprs: TP, minimum_payments_: TP, maximum_payments_: T
         money_saved,
         balance_on_actual
     )
+
+m1 = Model(budget = 1500, cards = [{"cardNickName": "Prime",
+             "cardBalance": 1000,
+             "cardApr": 18,
+             "minPayment": 20,
+             "maxPayment": 1000},
+             {"cardNickName": "United",
+             "cardBalance": 1800,
+             "cardApr": 9,
+             "minPayment": 36,
+             "maxPayment": 1800}])
+
+print(m1.cards)
