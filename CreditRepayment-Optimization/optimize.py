@@ -7,18 +7,9 @@ import typing
 import datetime
 import functools
 import itertools
-#from fastapi import FastAPI
+
 from pydantic import BaseModel, validator
 from typing import List
-
-# for testing locally
-""" app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-) """
 
 months = [
     "January",
@@ -199,17 +190,7 @@ class CompareOptionsCard(BaseModel):
 class CompareResponseModel(BaseModel):
     progress: typing.List[CompareOptionsCard]
 
-# TODO: Fixed Minimum Payment
 
-""" @app.get("/")
-async def read_root():
-    return {
-        "Message": "Welcome",
-        "Objective": api_objective.strip()
-    } """
-
-
-#@app.post("/cards", response_model=ResponseModel)
 def suggest_payments(model: Model):
     budget = model.budget
     #Savings = 0
@@ -270,7 +251,7 @@ def suggest_payments(model: Model):
     return return_data
 
 
-#@app.post("/cards/12", response_model=CompareResponseModel)
+
 def compare_12_months(model: Model):
     # cycle months
     current_month = months[datetime.date.today().month - 1]
