@@ -191,7 +191,7 @@ class CompareResponseModel(BaseModel):
     progress: typing.List[CompareOptionsCard]
 
 
-def suggest_payments(model: Model):
+def suggest_monthly_payments(model: Model):
     budget = model.budget
     #Savings = 0
     # if model.savings is not Null and model.savingsgoal < Savings:
@@ -216,7 +216,7 @@ def suggest_payments(model: Model):
         lp_status,
         _,
         on_actual
-    ) = allocate(balances, aprs, minimum_payments, maximum_payments, budget, actual_payments)
+    ) = allocatePayments(balances, aprs, minimum_payments, maximum_payments, budget, actual_payments)
 
     return_data = {
         'budget': model.budget,
@@ -252,7 +252,7 @@ def suggest_payments(model: Model):
 
 
 
-def compare_12_months(model: Model):
+def compare_12_months_projections(model: Model):
     # cycle months
     current_month = months[datetime.date.today().month - 1]
     cycles = itertools.cycle(months)  # cycle the months
@@ -288,7 +288,7 @@ def compare_12_months(model: Model):
             card.update_min()
 
             # calculation
-            new_balance = balance_on_constant_pay(card.minProjections[-1], card.minPayment, card.cardApr, 1)
+            new_balance = balance_on_const_pay(card.minProjections[-1], card.minPayment, card.cardApr, 1)
             new_balance = round(new_balance, 2)
             card.minProjections.append(new_balance)
 
@@ -298,7 +298,7 @@ def compare_12_months(model: Model):
         model.update_payments()
 
         for card in model.cards:
-            new_balance = balance_on_constant_pay(card.actualProjections[-1], card.actualPayments, card.cardApr, 1)
+            new_balance = balance_on_const_pay(card.actualProjections[-1], card.actualPayments, card.cardApr, 1)
             new_balance = round(new_balance, 2)
             card.actualProjections.append(new_balance)
 
@@ -308,7 +308,7 @@ def compare_12_months(model: Model):
     # projections on optimal payment month in month out
     optimal_monthly, new_balance = [balances], balances
     for _ in range(13):
-        new_balance = allocate(new_balance, aprs, minimum_payments, maximum_payments, budget=budget, solution_only=True)
+        new_balance = allocatePayments(new_balance, aprs, minimum_payments, maximum_payments, budget=budget, solution_only=True)
         new_balance = tuple(round(el, 4) for el in new_balance)
         optimal_monthly.append(new_balance)
 
@@ -341,7 +341,7 @@ TP = typing.Tuple[float, ...]
 
 
 @functools.lru_cache(maxsize=64)
-def balance_on_constant_pay(balance: float, payment: float, rate: float, n: int):
+def balance_on_const_pay(balance: float, payment: float, rate: float, n: int):
     """
     :param balance:
     :param payment:
@@ -354,7 +354,7 @@ def balance_on_constant_pay(balance: float, payment: float, rate: float, n: int)
     return max(0.0, balance_portion - payment_portion)
 
 
-def allocate(balances: TP, aprs: TP, minimum_payments_: TP, maximum_payments_: TP, budget: float,
+def allocatePayments(balances: TP, aprs: TP, minimum_payments_: TP, maximum_payments_: TP, budget: float,
              actual_payments: TP = None, solution_only: bool = False):
     """
     :param balances:

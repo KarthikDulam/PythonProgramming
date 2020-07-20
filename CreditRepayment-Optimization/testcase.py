@@ -32,11 +32,11 @@ def main():
     model = op.Model(budget=budget,cards= cards)
     
     # Run the suggest payments routine for the above data
-    sgst_pymnt = op.suggest_payments(model)
+    sgst_pymnt = op.suggest_monthly_payments(model)
     print(sgst_pymnt)
 
     #Run the 12 Months Comparison routine
-    tmonths = op.compare_12_months(model)
+    tmonths = op.compare_12_months_projections(model)
     print(tmonths)
 
 if __name__ == "__main__":
